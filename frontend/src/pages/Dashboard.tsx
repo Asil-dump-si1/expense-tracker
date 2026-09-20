@@ -1,0 +1,205 @@
+import { useEffect, useState } from "react";
+import * as api from "../api/client";
+import type { Budget, Category, CategoryTotal, SummaryTotals, Transaction, TrendPoint } from "../types";
+import TransactionForm from "../components/TransactionForm";
+import TransactionList from "../components/TransactionList";
+import CategoryManager from "../components/CategoryManager";
+import BudgetManager from "../components/BudgetManager";
+import CategoryPieChart from "../components/charts/CategoryPieChart";
+import MonthlyTrendChart from "../components/charts/MonthlyTrendChart";
+import BudgetProgress from "../components/charts/BudgetProgress";
+
+const now = new Date();
+
+function StatCard({ label, value, tone }: { label: string; value: number; tone: "up" | "down" | "neutral" }) {
+  const color = tone === "up" ? "text-emerald-600" : tone === "down" ? "text-red-500" : "text-slate-700";
+  return (
+    <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+      <div className="text-xs font-medium uppercase tracking-wide text-slate-400">{label}</div>
+      <div className={`mt-1 text-2xl font-semibold ${color}`}>₹{value.toFixed(2)}</div>
+    </div>
+  );
+}
+
+export default function Dashboard() {
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [summary, setSummary] = useState<{ current: SummaryTotals; previous: SummaryTotals } | null>(null);
+  const [byCategory, setByCategory] = useState<CategoryTotal[]>([]);
+  const [trend, setTrend] = useState<TrendPoint[]>([]);
+  const [editing, setEditing] = useState<Transaction | null>(null);
+  const [tab, setTab] = useState<"transactions" | "categories" | "budgets">("transactions");
+
+  async function refreshAll() {
+    const [cats, txs, buds, summ, cat, tr] = await Promise.all([
+      api.getCategories(),
+      api.getTransactions({ month, year, pageSize: 50 }),
+      api.getBudgets(month, year),
+      api.getSummary(month, year),
+      api.getByCategory(month, year),
+      api.getTrend(6),
+    ]);
+    setCategories(cats);
+    setTransactions(txs.items);
+    setBudgets(buds);
+    setSummary(summ);
+    setByCategory(cat);
+    setTrend(tr);
+  }
+
+  useEffect(() => {
+    refreshAll().catch(console.error);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [month, year]);
+
+  async function handleCreateOrUpdate(data: {
+    title: string;
+    amount: number;
+    type: "INCOME" | "EXPENSE";
+    date: string;
+    categoryId: string;
+    notes?: string;
+  }) {
+    if (editing) {
+      await api.updateTransaction(editing.id, data);
+      setEditing(null);
+    } else {
+      await api.createTransaction(data);
+    }
+    await refreshAll();
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this transaction?")) return;
+    await api.deleteTransaction(id);
+    await refreshAll();
+  }
+
+  const monthLabel = new Date(year, month - 1, 1).toLocaleString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <header className="border-b border-slate-100 bg-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+          <h1 className="text-lg font-semibold text-slate-800">💰 Expense Tracker</h1>
+          <div className="flex items-center gap-2 text-sm">
+            <select
+              value={month}
+              onChange={(e) => setMonth(Number(e.target.value))}
+              className="rounded-lg border border-slate-200 px-2 py-1.5"
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <option key={m} value={m}>
+                  {new Date(2000, m - 1, 1).toLocaleString("en-US", { month: "long" })}
+                </option>
+              ))}
+            </select>
+            <select
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+              className="rounded-lg border border-slate-200 px-2 py-1.5"
+            >
+              {[year - 1, year, year + 1].map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <StatCard label={`Income · ${monthLabel}`} value={summary?.current.income ?? 0} tone="up" />
+          <StatCard label={`Expense · ${monthLabel}`} value={summary?.current.expense ?? 0} tone="down" />
+          <StatCard
+            label="Net"
+            value={summary?.current.net ?? 0}
+            tone={(summary?.current.net ?? 0) >= 0 ? "up" : "down"}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+            <h2 className="mb-2 text-sm font-semibold text-slate-600">Spending by category</h2>
+            <CategoryPieChart data={byCategory} />
+          </div>
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+            <h2 className="mb-2 text-sm font-semibold text-slate-600">Income vs. expense (6 months)</h2>
+            <MonthlyTrendChart data={trend} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm lg:col-span-2">
+            <div className="mb-3 flex gap-4 border-b border-slate-100 text-sm font-medium text-slate-400">
+              {(["transactions", "categories", "budgets"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`pb-2 capitalize ${tab === t ? "border-b-2 border-brand-600 text-brand-600" : ""}`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            {tab === "transactions" && (
+              <div className="space-y-4">
+                <TransactionForm
+                  categories={categories}
+                  onSubmit={handleCreateOrUpdate}
+                  initial={editing}
+                  onCancel={editing ? () => setEditing(null) : undefined}
+                />
+                <TransactionList
+                  transactions={transactions}
+                  onEdit={setEditing}
+                  onDelete={handleDelete}
+                />
+              </div>
+            )}
+
+            {tab === "categories" && (
+              <CategoryManager
+                categories={categories}
+                onCreate={async (data) => {
+                  await api.createCategory(data);
+                  await refreshAll();
+                }}
+                onDelete={async (id) => {
+                  await api.deleteCategory(id);
+                  await refreshAll();
+                }}
+              />
+            )}
+
+            {tab === "budgets" && (
+              <BudgetManager
+                budgets={budgets}
+                categories={categories}
+                onSave={async ({ categoryId, amount }) => {
+                  await api.upsertBudget({ categoryId, amount, month, year });
+                  await refreshAll();
+                }}
+              />
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+            <h2 className="mb-3 text-sm font-semibold text-slate-600">Budget progress</h2>
+            <BudgetProgress budgets={budgets} />
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
