@@ -11,7 +11,7 @@ import type { CategoryTotal } from "../../types";
 export default function CategoryPieChart({ data }: { data: CategoryTotal[] }) {
   if (!data.length) {
     return (
-      <div className="flex h-64 items-center justify-center text-sm text-slate-400">
+      <div className="flex h-64 items-center justify-center text-sm text-ink-400">
         No expenses recorded for this month yet.
       </div>
     );

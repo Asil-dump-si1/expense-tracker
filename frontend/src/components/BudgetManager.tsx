@@ -22,7 +22,7 @@ export default function BudgetManager({ budgets, categories, onSave }: Props) {
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-2">
         <select
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+          className="rounded-lg border border-ink-100 px-3 py-2 text-sm focus:border-ink-600 focus:outline-none"
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
         >
@@ -33,7 +33,7 @@ export default function BudgetManager({ budgets, categories, onSave }: Props) {
           ))}
         </select>
         <input
-          className="w-32 rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+          className="tabular w-32 rounded-lg border border-ink-100 px-3 py-2 text-sm focus:border-ink-600 focus:outline-none"
           placeholder="Budget amount"
           type="number"
           step="0.01"
@@ -43,19 +43,19 @@ export default function BudgetManager({ budgets, categories, onSave }: Props) {
         />
         <button
           type="submit"
-          className="rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700"
+          className="rounded-lg bg-ink-700 px-3 py-2 text-sm font-medium text-white hover:bg-ink-900"
         >
           Set budget
         </button>
       </form>
 
-      <ul className="divide-y divide-slate-100 text-sm">
+      <ul className="divide-y divide-ink-100 text-sm">
         {budgets.map((b) => (
           <li key={b.id} className="flex items-center justify-between py-2">
             <span style={{ color: b.category.color }} className="font-medium">
               {b.category.name}
             </span>
-            <span className="text-slate-500">₹{b.amount.toFixed(2)} / month</span>
+            <span className="text-ink-400">₹{b.amount.toFixed(2)} / month</span>
           </li>
         ))}
       </ul>

@@ -12,11 +12,15 @@ import BudgetProgress from "../components/charts/BudgetProgress";
 const now = new Date();
 
 function StatCard({ label, value, tone }: { label: string; value: number; tone: "up" | "down" | "neutral" }) {
-  const color = tone === "up" ? "text-emerald-600" : tone === "down" ? "text-red-500" : "text-slate-700";
+  const accent =
+    tone === "up" ? "border-l-ledger-green" : tone === "down" ? "border-l-ledger-rust" : "border-l-ink-600";
+  const valueColor = tone === "up" ? "text-ledger-green" : tone === "down" ? "text-ledger-rust" : "text-ink-900";
   return (
-    <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-      <div className="text-xs font-medium uppercase tracking-wide text-slate-400">{label}</div>
-      <div className={`mt-1 text-2xl font-semibold ${color}`}>₹{value.toFixed(2)}</div>
+    <div className={`rounded-card border border-ink-100 border-l-4 bg-white p-4 ${accent}`}>
+      <div className="text-xs font-medium text-ink-400">{label}</div>
+      <div className={`tabular mt-1 text-2xl font-semibold ${valueColor}`}>
+        ₹{value.toFixed(2)}
+      </div>
     </div>
   );
 }
@@ -85,15 +89,15 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-100 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <h1 className="text-lg font-semibold text-slate-800">💰 Expense Tracker</h1>
+    <div className="min-h-screen bg-paper">
+      <header className="border-b border-ink-100 bg-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-lg font-semibold text-ink-900">Expense Tracker</h1>
           <div className="flex items-center gap-2 text-sm">
             <select
               value={month}
               onChange={(e) => setMonth(Number(e.target.value))}
-              className="rounded-lg border border-slate-200 px-2 py-1.5"
+              className="flex-1 rounded-lg border border-ink-100 px-2 py-1.5 text-ink-700 sm:flex-none"
             >
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                 <option key={m} value={m}>
@@ -104,7 +108,7 @@ export default function Dashboard() {
             <select
               value={year}
               onChange={(e) => setYear(Number(e.target.value))}
-              className="rounded-lg border border-slate-200 px-2 py-1.5"
+              className="rounded-lg border border-ink-100 px-2 py-1.5 text-ink-700"
             >
               {[year - 1, year, year + 1].map((y) => (
                 <option key={y} value={y}>
@@ -128,24 +132,26 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-            <h2 className="mb-2 text-sm font-semibold text-slate-600">Spending by category</h2>
+          <div className="rounded-card border border-ink-100 bg-white p-4">
+            <h2 className="mb-2 text-sm font-semibold text-ink-600">Spending by category</h2>
             <CategoryPieChart data={byCategory} />
           </div>
-          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-            <h2 className="mb-2 text-sm font-semibold text-slate-600">Income vs. expense (6 months)</h2>
+          <div className="rounded-card border border-ink-100 bg-white p-4">
+            <h2 className="mb-2 text-sm font-semibold text-ink-600">Income vs. expense, last 6 months</h2>
             <MonthlyTrendChart data={trend} />
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm lg:col-span-2">
-            <div className="mb-3 flex gap-4 border-b border-slate-100 text-sm font-medium text-slate-400">
+          <div className="rounded-card border border-ink-100 bg-white p-4 lg:col-span-2">
+            <div className="mb-3 flex gap-4 overflow-x-auto border-b border-ink-100 text-sm font-medium text-ink-400">
               {(["transactions", "categories", "budgets"] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`pb-2 capitalize ${tab === t ? "border-b-2 border-brand-600 text-brand-600" : ""}`}
+                  className={`whitespace-nowrap pb-2 capitalize ${
+                    tab === t ? "border-b-2 border-ink-700 text-ink-900" : ""
+                  }`}
                 >
                   {t}
                 </button>
@@ -194,8 +200,8 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-sm font-semibold text-slate-600">Budget progress</h2>
+          <div className="rounded-card border border-ink-100 bg-white p-4">
+            <h2 className="mb-3 text-sm font-semibold text-ink-600">Budget progress</h2>
             <BudgetProgress budgets={budgets} />
           </div>
         </div>

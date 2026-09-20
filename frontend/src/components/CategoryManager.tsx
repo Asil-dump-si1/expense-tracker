@@ -24,7 +24,7 @@ export default function CategoryManager({ categories, onCreate, onDelete }: Prop
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-2">
         <input
-          className="flex-1 min-w-[140px] rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+          className="flex-1 min-w-[140px] rounded-lg border border-ink-100 px-3 py-2 text-sm focus:border-ink-600 focus:outline-none"
           placeholder="New category name"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -35,14 +35,14 @@ export default function CategoryManager({ categories, onCreate, onDelete }: Prop
               type="button"
               key={c}
               onClick={() => setColor(c)}
-              className={`h-6 w-6 rounded-full border-2 ${color === c ? "border-slate-700" : "border-transparent"}`}
+              className={`h-6 w-6 rounded-full border-2 ${color === c ? "border-ink-900" : "border-transparent"}`}
               style={{ backgroundColor: c }}
             />
           ))}
         </div>
         <button
           type="submit"
-          className="rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700"
+          className="rounded-lg bg-ink-700 px-3 py-2 text-sm font-medium text-white hover:bg-ink-900"
         >
           Add
         </button>
@@ -57,7 +57,7 @@ export default function CategoryManager({ categories, onCreate, onDelete }: Prop
           >
             {c.name}
             {c._count?.transactions === 0 && (
-              <button onClick={() => onDelete(c.id)} className="text-slate-400 hover:text-red-500">
+              <button onClick={() => onDelete(c.id)} className="text-ink-400 hover:text-red-500">
                 ×
               </button>
             )}

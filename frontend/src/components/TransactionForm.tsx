@@ -52,14 +52,14 @@ export default function TransactionForm({ categories, onSubmit, initial, onCance
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <input
-        className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+        className="rounded-lg border border-ink-100 px-3 py-2 text-sm focus:border-ink-600 focus:outline-none"
         placeholder="Title (e.g. Groceries)"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
       />
       <input
-        className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+        className="tabular rounded-lg border border-ink-100 px-3 py-2 text-sm focus:border-ink-600 focus:outline-none"
         placeholder="Amount"
         type="number"
         step="0.01"
@@ -69,7 +69,7 @@ export default function TransactionForm({ categories, onSubmit, initial, onCance
         required
       />
       <select
-        className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+        className="rounded-lg border border-ink-100 px-3 py-2 text-sm focus:border-ink-600 focus:outline-none"
         value={type}
         onChange={(e) => setType(e.target.value as TransactionType)}
       >
@@ -77,7 +77,7 @@ export default function TransactionForm({ categories, onSubmit, initial, onCance
         <option value="INCOME">Income</option>
       </select>
       <select
-        className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+        className="rounded-lg border border-ink-100 px-3 py-2 text-sm focus:border-ink-600 focus:outline-none"
         value={categoryId}
         onChange={(e) => setCategoryId(e.target.value)}
         required
@@ -89,14 +89,14 @@ export default function TransactionForm({ categories, onSubmit, initial, onCance
         ))}
       </select>
       <input
-        className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none"
+        className="rounded-lg border border-ink-100 px-3 py-2 text-sm focus:border-ink-600 focus:outline-none"
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
         required
       />
       <input
-        className="rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none sm:col-span-2"
+        className="rounded-lg border border-ink-100 px-3 py-2 text-sm focus:border-ink-600 focus:outline-none sm:col-span-2"
         placeholder="Notes (optional)"
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
@@ -105,7 +105,7 @@ export default function TransactionForm({ categories, onSubmit, initial, onCance
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+          className="rounded-lg bg-ink-700 px-4 py-2 text-sm font-medium text-white hover:bg-ink-900 disabled:opacity-50"
         >
           {initial ? "Save changes" : "Add transaction"}
         </button>
@@ -113,7 +113,7 @@ export default function TransactionForm({ categories, onSubmit, initial, onCance
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-ink-100 px-4 py-2 text-sm font-medium text-ink-600 hover:bg-ink-50"
           >
             Cancel
           </button>
